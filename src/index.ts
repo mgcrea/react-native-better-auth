@@ -21,3 +21,6 @@ export {
   hasSessionCookieChanged,
   normalizeCookieName,
 } from "./cookies";
+
+// Debug utilities
+export { isDebugEnabled, log, setDebugEnabled } from "./utils";

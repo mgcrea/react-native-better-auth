@@ -1,5 +1,6 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { reactNativeClient } from "./reactNativeClient";
+import { setDebugEnabled } from "./utils";
 
 function createMockStorage() {
   const storage = new Map<string, string>();
@@ -13,6 +14,11 @@ function createMockStorage() {
 describe("reactNativeClient", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    setDebugEnabled(false);
+  });
+
+  afterEach(() => {
+    setDebugEnabled(false);
   });
 
   describe("plugin configuration", () => {
@@ -443,6 +449,73 @@ describe("reactNativeClient", () => {
       expect(storedCookie).toBeDefined();
       const parsed = JSON.parse(storedCookie!);
       expect(parsed["my-app.session_token"].value).toBe("token123");
+    });
+  });
+
+  describe("debug option", () => {
+    it("should enable debug logging when debug is true", () => {
+      const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+      const storage = createMockStorage();
+
+      reactNativeClient({
+        scheme: "myapp",
+        storage,
+        debug: true,
+      });
+
+      expect(consoleSpy).toHaveBeenCalled();
+      consoleSpy.mockRestore();
+    });
+
+    it("should not log when debug is false", () => {
+      const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+      const storage = createMockStorage();
+
+      reactNativeClient({
+        scheme: "myapp",
+        storage,
+        debug: false,
+      });
+
+      expect(consoleSpy).not.toHaveBeenCalled();
+      consoleSpy.mockRestore();
+    });
+  });
+
+  describe("onError hook", () => {
+    it("should have onError hook defined", () => {
+      const storage = createMockStorage();
+      const plugin = reactNativeClient({
+        scheme: "myapp",
+        storage,
+      });
+
+      const fetchPlugin = plugin.fetchPlugins![0];
+      expect(fetchPlugin.hooks?.onError).toBeDefined();
+      expect(typeof fetchPlugin.hooks?.onError).toBe("function");
+    });
+
+    it("should handle 401 errors without throwing", async () => {
+      const storage = createMockStorage();
+      const plugin = reactNativeClient({
+        scheme: "myapp",
+        storage,
+      });
+
+      const fetchPlugin = plugin.fetchPlugins![0];
+
+      const mockContext = {
+        request: {
+          url: new URL("http://api.example.com/auth/session"),
+        },
+        response: {
+          status: 401,
+        },
+        error: new Error("Unauthorized"),
+      };
+
+      // Should not throw
+      await expect(fetchPlugin.hooks!.onError!(mockContext as never)).resolves.toBeUndefined();
     });
   });
 });
