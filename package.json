@@ -1,0 +1,46 @@
+{
+  "name": "@mgcrea/react-native-better-auth",
+  "version": "1.0.0",
+  "description": "",
+  "author": "Olivier Louvignes <olivier@mgcrea.io> (https://github.com/mgcrea)",
+  "homepage": "https://github.com/mgcrea/react-native-better-auth#readme",
+  "repository": "github:mgcrea/react-native-better-auth",
+  "license": "MIT",
+  "type": "commonjs",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "npm run build:babel && npm run build:types",
+    "build:babel": "babel src --out-dir dist --extensions \".ts,.tsx,.js,.jsx\" --copy-files",
+    "build:types": "tsc --emitDeclarationOnly",
+    "lint": "eslint .",
+    "check": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "keywords": [],
+  "peerDependencies": {
+    "better-auth": ">=1.4.7",
+    "react": ">=18.2.0",
+    "react-native": ">=0.76.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.28.3",
+    "@babel/core": "^7.28.5",
+    "@babel/runtime": "^7.28.4",
+    "@mgcrea/eslint-config-react-native": "^0.14.1",
+    "@react-native-community/cli": "^20.0.2",
+    "@react-native/babel-preset": "0.83.1",
+    "@react-native/typescript-config": "0.83.1",
+    "babel-plugin-module-resolver": "^5.0.2",
+    "better-auth": "^1.4.7",
+    "eslint": "^9.39.2",
+    "prettier": "^3.7.4",
+    "prettier-plugin-organize-imports": "^4.3.0",
+    "react": "^19.2.3",
+    "react-native": "0.83.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.16"
+  },
+  "packageManager": "pnpm@10.26.0"
+}

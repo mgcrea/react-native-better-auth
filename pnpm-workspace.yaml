@@ -1,0 +1,6 @@
+onlyBuiltDependencies:
+  - esbuild
+  - unrs-resolver
+
+publicHoistPattern:
+  - '@better-auth/core'
