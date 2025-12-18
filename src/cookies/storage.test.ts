@@ -95,7 +95,7 @@ describe("getCookie", () => {
       session: { value: "abc123", expires: "2025-01-02T00:00:00.000Z" },
     });
     const result = getCookie(stored);
-    expect(result).toBe("; session=abc123");
+    expect(result).toBe("session=abc123");
   });
 
   it("should filter out expired cookies", () => {
@@ -113,7 +113,7 @@ describe("getCookie", () => {
       session: { value: "abc123", expires: null },
     });
     const result = getCookie(stored);
-    expect(result).toBe("; session=abc123");
+    expect(result).toBe("session=abc123");
   });
 
   it("should handle empty cookie storage", () => {
@@ -126,7 +126,7 @@ describe("getCookie", () => {
     expect(result).toBe("");
   });
 
-  it("should concatenate multiple cookies", () => {
+  it("should concatenate multiple cookies with proper separator", () => {
     const stored = JSON.stringify({
       cookie1: { value: "value1", expires: null },
       cookie2: { value: "value2", expires: null },
@@ -134,6 +134,9 @@ describe("getCookie", () => {
     const result = getCookie(stored);
     expect(result).toContain("cookie1=value1");
     expect(result).toContain("cookie2=value2");
+    expect(result).toContain("; ");
+    // Should not have leading semicolon
+    expect(result).not.toMatch(/^; /);
   });
 });
 

@@ -62,13 +62,10 @@ export function getCookie(cookie: string): string {
   } catch {
     // Ignore parse errors
   }
-  const toSend = Object.entries(parsed).reduce((acc, [key, value]) => {
-    if (value.expires && new Date(value.expires) < new Date()) {
-      return acc;
-    }
-    return `${acc}; ${key}=${value.value}`;
-  }, "");
-  return toSend;
+  const validCookies = Object.entries(parsed)
+    .filter(([, value]) => !value.expires || new Date(value.expires) >= new Date())
+    .map(([key, value]) => `${key}=${value.value}`);
+  return validCookies.join("; ");
 }
 
 /**
