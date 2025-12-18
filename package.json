@@ -9,6 +9,10 @@
   "type": "commonjs",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "files": [
+    "src",
+    "dist"
+  ],
   "scripts": {
     "build": "npm run build:babel && npm run build:types",
     "build:babel": "babel src --out-dir dist --extensions \".ts,.tsx,.js,.jsx\" --copy-files",
