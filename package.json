@@ -19,8 +19,9 @@
     "build:types": "tsc --emitDeclarationOnly",
     "lint": "eslint .",
     "check": "tsc --noEmit",
-    "test": "vitest run",
-    "test:watch": "vitest",
+    "spec": "vitest run",
+    "spec:watch": "vitest",
+    "test": "npm run lint && npm run check && npm run spec",
     "prepublishOnly": "npm run build"
   },
   "keywords": [],
