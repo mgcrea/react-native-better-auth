@@ -71,8 +71,7 @@ describe("getSetCookie", () => {
   });
 
   it("should parse multiple cookies from header", () => {
-    const header =
-      "better-auth.session_token=token123; Path=/, better-auth.session_data=data456; Path=/";
+    const header = "better-auth.session_token=token123; Path=/, better-auth.session_data=data456; Path=/";
     const result = getSetCookie(header);
     const parsed = JSON.parse(result);
     expect(parsed["better-auth.session_token"].value).toBe("token123");

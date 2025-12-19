@@ -72,8 +72,7 @@ describe("parseSetCookieHeader", () => {
   });
 
   it("should parse multiple cookies", () => {
-    const header =
-      "better-auth.session_token=abc; Path=/, better-auth.session_data=xyz; Path=/";
+    const header = "better-auth.session_token=abc; Path=/, better-auth.session_data=xyz; Path=/";
     const result = parseSetCookieHeader(header);
     expect(result.get("better-auth.session_token")?.value).toBe("abc");
     expect(result.get("better-auth.session_data")?.value).toBe("xyz");
@@ -83,7 +82,7 @@ describe("parseSetCookieHeader", () => {
     const header = "token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0=";
     const result = parseSetCookieHeader(header);
     expect(result.get("token")?.value).toBe(
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0="
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0=",
     );
   });
 

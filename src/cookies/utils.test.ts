@@ -102,8 +102,7 @@ describe("hasBetterAuthCookies", () => {
     });
 
     it("should return true for mixed headers containing better-auth cookies", () => {
-      const header =
-        "__cf_bm=abc123; Path=/; HttpOnly; Secure, better-auth.session_token=xyz; Path=/";
+      const header = "__cf_bm=abc123; Path=/; HttpOnly; Secure, better-auth.session_token=xyz; Path=/";
       expect(hasBetterAuthCookies(header, "better-auth")).toBe(true);
     });
 

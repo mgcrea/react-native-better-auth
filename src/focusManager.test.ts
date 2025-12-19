@@ -1,6 +1,6 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { AppState } from "react-native";
 import { kFocusManager } from "better-auth/client";
+import { AppState } from "react-native";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { setupFocusManager } from "./focusManager";
 
 describe("focusManager", () => {
