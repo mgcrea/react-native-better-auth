@@ -138,6 +138,73 @@ describe("reactNativeClient", () => {
       expect(result.options?.credentials).toBe("omit");
     });
 
+    it("should preserve existing headers from plain object", () => {
+      const storage = createMockStorage();
+      const plugin = reactNativeClient({
+        scheme: "myapp",
+        storage,
+      });
+
+      const fetchPlugin = plugin.fetchPlugins![0];
+      const result = fetchPlugin.init!("http://api.example.com/auth/session", {
+        headers: {
+          Authorization: "Bearer token123",
+          "Content-Type": "application/json",
+        },
+      }) as {
+        options?: { headers?: Record<string, string> };
+      };
+
+      expect(result.options?.headers?.Authorization).toBe("Bearer token123");
+      expect(result.options?.headers?.["Content-Type"]).toBe("application/json");
+      expect(result.options?.headers?.Origin).toBe("myapp://");
+    });
+
+    it("should preserve existing headers from Headers object", () => {
+      const storage = createMockStorage();
+      const plugin = reactNativeClient({
+        scheme: "myapp",
+        storage,
+      });
+
+      const headers = new Headers();
+      headers.set("Authorization", "Bearer token123");
+      headers.set("Content-Type", "application/json");
+
+      const fetchPlugin = plugin.fetchPlugins![0];
+      const result = fetchPlugin.init!("http://api.example.com/auth/session", {
+        headers,
+      }) as {
+        options?: { headers?: Record<string, string> };
+      };
+
+      expect(result.options?.headers?.authorization).toBe("Bearer token123");
+      expect(result.options?.headers?.["content-type"]).toBe("application/json");
+      expect(result.options?.headers?.Origin).toBe("myapp://");
+    });
+
+    it("should preserve existing headers from string[][] array", () => {
+      const storage = createMockStorage();
+      const plugin = reactNativeClient({
+        scheme: "myapp",
+        storage,
+      });
+
+      const fetchPlugin = plugin.fetchPlugins![0];
+      const result = fetchPlugin.init!("http://api.example.com/auth/session", {
+        headers: [
+          ["Authorization", "Bearer token123"],
+          ["Content-Type", "application/json"],
+        ],
+      }) as {
+        options?: { headers?: Record<string, string> };
+      };
+
+      expect(result.options?.headers?.Authorization).toBe("Bearer token123");
+      expect(result.options?.headers?.["Content-Type"]).toBe("application/json");
+      expect(result.options?.headers?.Origin).toBe("myapp://");
+    });
+
     it("should clear cookies on sign-out", () => {
       const storage = createMockStorage();
       storage.setItem(

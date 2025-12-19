@@ -77,6 +77,36 @@ describe("getSetCookie", () => {
     expect(parsed["better-auth.session_token"].value).toBe("token123");
     expect(parsed["better-auth.session_data"].value).toBe("data456");
   });
+
+  it("should handle invalid max-age without crashing", () => {
+    const header = "session=abc123; Max-Age=invalid";
+    const result = getSetCookie(header);
+    const parsed = JSON.parse(result);
+    expect(parsed.session).toEqual({
+      value: "abc123",
+      expires: null,
+    });
+  });
+
+  it("should handle invalid expires date without crashing", () => {
+    const header = "session=abc123; Expires=not-a-date";
+    const result = getSetCookie(header);
+    const parsed = JSON.parse(result);
+    expect(parsed.session).toEqual({
+      value: "abc123",
+      expires: null,
+    });
+  });
+
+  it("should prefer max-age over expires when both are present", () => {
+    const header = "session=abc123; Max-Age=7200; Expires=Wed, 01 Jan 2025 12:00:00 GMT";
+    const result = getSetCookie(header);
+    const parsed = JSON.parse(result);
+    expect(parsed.session).toEqual({
+      value: "abc123",
+      expires: "2025-01-01T02:00:00.000Z", // 2 hours from mock time, not the Expires value
+    });
+  });
 });
 
 describe("getCookie", () => {
