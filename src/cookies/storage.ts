@@ -18,6 +18,14 @@ export type StorageAdapter = {
 };
 
 /**
+ * Safely parse a date, returning null for invalid dates.
+ */
+function safeParseDate(value: string | number): Date | null {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+/**
  * Convert a Set-Cookie header to a storable JSON string.
  * Merges with existing cookies if provided.
  */
@@ -27,11 +35,17 @@ export function getSetCookie(header: string, prevCookie?: string): string {
   parsed.forEach((cookie: CookieAttributes, key: string) => {
     const expiresAt = cookie.expires;
     const maxAge = cookie["max-age"];
-    const expires = maxAge
-      ? new Date(Date.now() + maxAge * 1000)
-      : expiresAt
-        ? new Date(String(expiresAt))
-        : null;
+    let expires: Date | null = null;
+
+    if (maxAge) {
+      const maxAgeNum = Number(maxAge);
+      if (!Number.isNaN(maxAgeNum)) {
+        expires = new Date(Date.now() + maxAgeNum * 1000);
+      }
+    } else if (expiresAt) {
+      expires = safeParseDate(expiresAt);
+    }
+
     toSetCookie[key] = {
       value: cookie.value,
       expires: expires ? expires.toISOString() : null,

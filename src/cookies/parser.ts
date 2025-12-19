@@ -1,15 +1,17 @@
 /**
- * Cookie attributes parsed from Set-Cookie header
+ * Cookie attributes parsed from Set-Cookie header.
+ * Note: All attributes are stored as strings as parsed from the header.
+ * Consumers should convert expires/max-age to proper types when needed.
  */
 export type CookieAttributes = {
   value: string;
-  expires?: Date;
-  "max-age"?: number;
+  expires?: string;
+  "max-age"?: string;
   domain?: string;
   path?: string;
-  secure?: boolean;
-  httpOnly?: boolean;
-  sameSite?: "Strict" | "Lax" | "None";
+  secure?: string;
+  httponly?: string;
+  samesite?: string;
 };
 
 /**

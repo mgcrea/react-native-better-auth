@@ -177,8 +177,25 @@ export const reactNativeClient = (opts: ReactNativeClientOptions): BetterAuthCli
           });
 
           options.credentials = "omit";
+
+          // Convert headers to a plain object, handling Headers, string[][], and Record types
+          let existingHeaders: Record<string, string> = {};
+          if (options.headers) {
+            if (options.headers instanceof Headers) {
+              options.headers.forEach((value: string, key: string) => {
+                existingHeaders[key] = value;
+              });
+            } else if (Array.isArray(options.headers)) {
+              for (const entry of options.headers as string[][]) {
+                existingHeaders[entry[0]] = entry[1];
+              }
+            } else {
+              existingHeaders = { ...(options.headers as Record<string, string>) };
+            }
+          }
+
           options.headers = {
-            ...(options.headers as Record<string, string> | undefined),
+            ...existingHeaders,
             cookie,
             Origin: getOrigin(),
           };
