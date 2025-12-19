@@ -139,7 +139,7 @@ interface StorageAdapter {
 }
 ```
 
-### MMKV Storage (Recommended)
+### MMKV Storage
 
 ```typescript
 import { MMKV } from "react-native-mmkv";
@@ -152,7 +152,52 @@ export const mmkvStorage = {
 };
 ```
 
-> **Note:** MMKV files are protected by iOS's Data Protection (file-level encryption when device is locked). For high-security apps, you can add MMKV's `encryptionKey` option with a key stored in the Keychain via [react-native-keychain](https://github.com/oblador/react-native-keychain).
+> **Note:** MMKV files are protected by iOS's Data Protection (file-level encryption when device is locked). For high-security apps, see the encrypted storage example below.
+
+### Keychain Storage (High Security)
+
+For high-security apps, store session data directly in the Keychain using [react-native-keychain](https://github.com/oblador/react-native-keychain):
+
+```typescript
+import * as Keychain from "react-native-keychain";
+
+const KEYCHAIN_SERVICE = "com.myapp.auth";
+
+export const keychainStorage = {
+  getItem: (key: string): string | null => {
+    // Note: This is synchronous but Keychain is async
+    // You may need to initialize storage before creating the auth client
+    return keychainCache.get(key) ?? null;
+  },
+  setItem: (key: string, value: string): void => {
+    keychainCache.set(key, value);
+    void Keychain.setGenericPassword(key, value, {
+      service: `${KEYCHAIN_SERVICE}.${key}`,
+      accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+    });
+  },
+};
+
+// In-memory cache for synchronous access
+const keychainCache = new Map<string, string>();
+
+// Call this at app startup before creating auth client
+export async function initKeychainStorage(keys: string[]) {
+  for (const key of keys) {
+    const credentials = await Keychain.getGenericPassword({
+      service: `${KEYCHAIN_SERVICE}.${key}`,
+    });
+    if (credentials) {
+      keychainCache.set(key, credentials.password);
+    }
+  }
+}
+
+// Usage at app startup:
+// await initKeychainStorage(["better-auth_cookie", "better-auth_session_data"]);
+```
+
+This stores session tokens in the iOS Keychain, which provides hardware-backed encryption and protection even on jailbroken devices.
 
 ## Differences from Expo Client
 
