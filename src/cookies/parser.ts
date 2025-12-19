@@ -1,16 +1,16 @@
 /**
  * Cookie attributes parsed from Set-Cookie header
  */
-export interface CookieAttributes {
+export type CookieAttributes = {
   value: string;
-  expires?: Date | undefined;
-  "max-age"?: number | undefined;
-  domain?: string | undefined;
-  path?: string | undefined;
-  secure?: boolean | undefined;
-  httpOnly?: boolean | undefined;
-  sameSite?: ("Strict" | "Lax" | "None") | undefined;
-}
+  expires?: Date;
+  "max-age"?: number;
+  domain?: string;
+  path?: string;
+  secure?: boolean;
+  httpOnly?: boolean;
+  sameSite?: "Strict" | "Lax" | "None";
+};
 
 /**
  * Split a Set-Cookie header into individual cookies.
@@ -57,15 +57,18 @@ export function parseSetCookieHeader(header: string): Map<string, CookieAttribut
   cookies.forEach((cookie) => {
     const parts = cookie.split(";").map((p) => p.trim());
     const [nameValue, ...attributes] = parts;
-    const [name, ...valueParts] = nameValue!.split("=");
+    if (!nameValue) return;
+    const [name, ...valueParts] = nameValue.split("=");
+    if (!name) return;
     const value = valueParts.join("=");
     const cookieObj: CookieAttributes = { value };
     attributes.forEach((attr) => {
       const [attrName, ...attrValueParts] = attr.split("=");
+      if (!attrName) return;
       const attrValue = attrValueParts.join("=");
-      cookieObj[attrName!.toLowerCase() as "value"] = attrValue;
+      cookieObj[attrName.toLowerCase() as "value"] = attrValue;
     });
-    cookieMap.set(name!, cookieObj);
+    cookieMap.set(name, cookieObj);
   });
   return cookieMap;
 }

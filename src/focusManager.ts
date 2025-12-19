@@ -31,8 +31,6 @@ class ReactNativeFocusManager implements FocusManager {
 
 export function setupFocusManager() {
   const global = globalThis as Record<symbol, unknown>;
-  if (!global[kFocusManager]) {
-    global[kFocusManager] = new ReactNativeFocusManager();
-  }
+  global[kFocusManager] ??= new ReactNativeFocusManager();
   return global[kFocusManager] as FocusManager;
 }

@@ -54,17 +54,17 @@ export type ReactNativeClientOptions = {
  */
 export const reactNativeClient = (opts: ReactNativeClientOptions): BetterAuthClientPlugin => {
   // Enable debug logging if requested
-  if (opts?.debug) {
+  if (opts.debug) {
     setDebugEnabled(true);
   }
 
   let store: ClientStore | null = null;
-  const storagePrefix = opts?.storagePrefix || "better-auth";
+  const storagePrefix = opts.storagePrefix ?? "better-auth";
   const cookieName = `${storagePrefix}_cookie`;
   const localCacheName = `${storagePrefix}_session_data`;
-  const storage = storageAdapter(opts?.storage);
+  const storage = storageAdapter(opts.storage);
   const isWeb = Platform.OS === "web";
-  const cookiePrefix = opts?.cookiePrefix || "better-auth";
+  const cookiePrefix = opts.cookiePrefix ?? "better-auth";
   const scheme = opts.scheme;
 
   log("Plugin initialized", { storagePrefix, cookieName, cookiePrefix, scheme, isWeb });
@@ -84,7 +84,7 @@ export const reactNativeClient = (opts: ReactNativeClientOptions): BetterAuthCli
          */
         getCookie: () => {
           const cookie = storage.getItem(cookieName);
-          return getCookie(cookie || "{}");
+          return getCookie(cookie ?? "{}");
         },
       };
     },
@@ -93,13 +93,15 @@ export const reactNativeClient = (opts: ReactNativeClientOptions): BetterAuthCli
         id: "react-native",
         name: "ReactNative",
         hooks: {
-          async onError(context) {
+          onError(context) {
             if (isWeb) return;
             const url = context.request.url.toString();
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             const status = context.response?.status;
             log("onError", {
               url,
               status,
+              // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
               error: context.error?.message,
             });
 
@@ -111,7 +113,7 @@ export const reactNativeClient = (opts: ReactNativeClientOptions): BetterAuthCli
               });
             }
           },
-          async onSuccess(context) {
+          onSuccess(context) {
             if (isWeb) return;
 
             const url = context.request.url.toString();
@@ -127,7 +129,7 @@ export const reactNativeClient = (opts: ReactNativeClientOptions): BetterAuthCli
 
               if (hasBetterAuthCookies(setCookie, cookiePrefix)) {
                 const prevCookie = storage.getItem(cookieName);
-                const toSetCookie = getSetCookie(setCookie || "", prevCookie ?? undefined);
+                const toSetCookie = getSetCookie(setCookie, prevCookie ?? undefined);
                 log("Processing cookies", {
                   hasPrevCookie: !!prevCookie,
                   cookieChanged: hasSessionCookieChanged(prevCookie, toSetCookie),
@@ -146,8 +148,8 @@ export const reactNativeClient = (opts: ReactNativeClientOptions): BetterAuthCli
               }
             }
 
-            if (url.includes("/get-session") && !opts?.disableCache) {
-              const data = context.data;
+            if (url.includes("/get-session") && !opts.disableCache) {
+              const data = context.data as { session?: unknown } | undefined;
               storage.setItem(localCacheName, JSON.stringify(data));
               log("Cached session data", { hasSession: !!data?.session });
             }
@@ -163,9 +165,9 @@ export const reactNativeClient = (opts: ReactNativeClientOptions): BetterAuthCli
             };
           }
 
-          options = options || {};
+          options = options ?? {};
           const storedCookie = storage.getItem(cookieName);
-          const cookie = getCookie(storedCookie || "{}");
+          const cookie = getCookie(storedCookie ?? "{}");
 
           log("Attaching cookie to request", {
             hasStoredCookie: !!storedCookie,
@@ -176,7 +178,7 @@ export const reactNativeClient = (opts: ReactNativeClientOptions): BetterAuthCli
 
           options.credentials = "omit";
           options.headers = {
-            ...options.headers,
+            ...(options.headers as Record<string, string> | undefined),
             cookie,
             Origin: getOrigin(),
           };
@@ -184,12 +186,15 @@ export const reactNativeClient = (opts: ReactNativeClientOptions): BetterAuthCli
           if (url.includes("/sign-out")) {
             log("Sign-out detected, clearing cookies");
             storage.setItem(cookieName, "{}");
-            store?.atoms.session?.set({
-              ...store.atoms.session.get(),
-              data: null,
-              error: null,
-              isPending: false,
-            });
+            const session = store?.atoms.session;
+            if (session) {
+              session.set({
+                ...session.get(),
+                data: null,
+                error: null,
+                isPending: false,
+              });
+            }
             storage.setItem(localCacheName, "{}");
           }
 

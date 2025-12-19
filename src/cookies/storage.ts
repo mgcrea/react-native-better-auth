@@ -4,42 +4,42 @@ import { normalizeCookieName } from "./utils";
 /**
  * Stored cookie format with value and expiry timestamp
  */
-export interface StoredCookie {
+export type StoredCookie = {
   value: string;
   expires: string | null;
-}
+};
 
 /**
  * Storage interface for cookie persistence
  */
-export interface StorageAdapter {
+export type StorageAdapter = {
   getItem: (key: string) => string | null;
   setItem: (key: string, value: string) => void;
-}
+};
 
 /**
  * Convert a Set-Cookie header to a storable JSON string.
  * Merges with existing cookies if provided.
  */
-export function getSetCookie(header: string, prevCookie?: string | undefined): string {
+export function getSetCookie(header: string, prevCookie?: string): string {
   const parsed = parseSetCookieHeader(header);
   let toSetCookie: Record<string, StoredCookie> = {};
   parsed.forEach((cookie: CookieAttributes, key: string) => {
-    const expiresAt = cookie["expires"];
+    const expiresAt = cookie.expires;
     const maxAge = cookie["max-age"];
     const expires = maxAge
-      ? new Date(Date.now() + Number(maxAge) * 1000)
+      ? new Date(Date.now() + maxAge * 1000)
       : expiresAt
         ? new Date(String(expiresAt))
         : null;
     toSetCookie[key] = {
-      value: cookie["value"],
+      value: cookie.value,
       expires: expires ? expires.toISOString() : null,
     };
   });
   if (prevCookie) {
     try {
-      const prevCookieParsed = JSON.parse(prevCookie);
+      const prevCookieParsed = JSON.parse(prevCookie) as Record<string, StoredCookie>;
       toSetCookie = {
         ...prevCookieParsed,
         ...toSetCookie,
@@ -78,7 +78,7 @@ export function storageAdapter(storage: StorageAdapter): StorageAdapter {
       return storage.getItem(normalizeCookieName(name));
     },
     setItem: (name: string, value: string) => {
-      return storage.setItem(normalizeCookieName(name), value);
+      storage.setItem(normalizeCookieName(name), value);
     },
   };
 }

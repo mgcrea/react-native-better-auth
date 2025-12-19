@@ -25,7 +25,9 @@ export function hasSessionCookieChanged(prevCookie: string | null, newCookie: st
     });
 
     for (const key of sessionKeys) {
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       const prevValue = prev[key]?.value;
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       const nextValue = next[key]?.value;
       if (prevValue !== nextValue) {
         return true;
