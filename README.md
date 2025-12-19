@@ -68,7 +68,7 @@ import { reactNativeClient } from "@mgcrea/react-native-better-auth";
 import { MMKV } from "react-native-mmkv";
 
 // Create MMKV storage adapter
-const storage = new MMKV();
+const storage = new MMKV({ id: "auth-storage" });
 const mmkvStorage = {
   getItem: (key: string): string | null => storage.getString(key) ?? null,
   setItem: (key: string, value: string): void => storage.set(key, value),
@@ -144,13 +144,15 @@ interface StorageAdapter {
 ```typescript
 import { MMKV } from "react-native-mmkv";
 
-const storage = new MMKV();
+const storage = new MMKV({ id: "auth-storage" });
 
 export const mmkvStorage = {
   getItem: (key: string): string | null => storage.getString(key) ?? null,
   setItem: (key: string, value: string): void => storage.set(key, value),
 };
 ```
+
+> **Note:** MMKV files are protected by iOS's Data Protection (file-level encryption when device is locked). For high-security apps, you can add MMKV's `encryptionKey` option with a key stored in the Keychain via [react-native-keychain](https://github.com/oblador/react-native-keychain).
 
 ## Differences from Expo Client
 
