@@ -21,6 +21,9 @@
   <a href="https://github.com/mgcrea/react-native-better-auth/actions/workflows/main.yaml">
     <img src="https://img.shields.io/github/actions/workflow/status/mgcrea/react-native-better-auth/main.yaml?style=for-the-badge&branch=main" alt="build status" />
   </a>
+  <a href="https://depfu.com/github/mgcrea/react-native-better-auth">
+    <img src="https://img.shields.io/badge/dependencies-none-brightgreen?style=for-the-badge" alt="dependencies status" />
+  </a>
 </p>
 <!-- markdownlint-enable MD033 -->
 
